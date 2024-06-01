@@ -1,3 +1,0 @@
-/home/anhld/Projects/pomopico/firmware/build/pioasm/CMakeFiles/pioasm.dir
-/home/anhld/Projects/pomopico/firmware/build/pioasm/CMakeFiles/edit_cache.dir
-/home/anhld/Projects/pomopico/firmware/build/pioasm/CMakeFiles/rebuild_cache.dir

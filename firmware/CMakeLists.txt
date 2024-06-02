@@ -10,6 +10,7 @@ pico_sdk_init()
 
 add_executable(pomopico
     pomopico.c
+    display.c
 )
 
 pico_enable_stdio_usb(pomopico 1)
@@ -19,4 +20,5 @@ pico_add_extra_outputs(pomopico)
 target_link_libraries(pomopico 
     pico_stdlib
     hardware_gpio
+    hardware_spi
 )

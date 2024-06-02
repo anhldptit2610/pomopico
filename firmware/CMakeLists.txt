@@ -11,6 +11,7 @@ pico_sdk_init()
 add_executable(pomopico
     pomopico.c
     display.c
+    clock.c
 )
 
 pico_enable_stdio_usb(pomopico 1)
@@ -21,4 +22,5 @@ target_link_libraries(pomopico
     pico_stdlib
     hardware_gpio
     hardware_spi
+    hardware_i2c
 )

@@ -23,5 +23,6 @@ typedef enum {
 void display_init(void);
 void display_enter_test_mode(void);
 void display_show_number(uint8_t pos, uint8_t num, bool dp);
+void display_show_time(uint8_t seconds, uint8_t minutes, uint8_t hours);
 
 #endif

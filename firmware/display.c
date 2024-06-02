@@ -38,7 +38,7 @@ int scanLimit = 1;
 
 #define TO_U16(lsb, msb)            (((uint16_t)(msb) << 8) | (uint16_t)(lsb))
 #define SPI_BAUDRATE                10 * 1000 * 1000
-#define LED_COUNT                   4
+#define LED_COUNT                   6
 #define MAX7219_DIGIT_0             0x01
 #define MAX7219_DIGIT_1             0x02
 #define MAX7219_DIGIT_2             0x03
@@ -65,6 +65,28 @@ void display_show_number(uint8_t pos, uint8_t num, bool dp)
     else if (decodeMode == DECODE_MODE_ALL)
         data = font[num].codeB | ((uint8_t)dp << 7);
     display_send_cmd(pos + 1, data);
+}
+
+void display_show_time(uint8_t seconds, uint8_t minutes, uint8_t hours)
+{
+    uint8_t pos, data;
+
+    pos = 0;
+    for (int i = 0; i < 2; i++) {
+        data = seconds % 10;
+        display_show_number(pos++, data, false);
+        seconds /= 10;
+    } 
+    for (int i = 0; i < 2; i++) {
+        data = minutes % 10;
+        display_show_number(pos++, data, false);
+        minutes /= 10;
+    } 
+    for (int i = 0; i < 2; i++) {
+        data = hours % 10;
+        display_show_number(pos++, data, false);
+        hours /= 10;
+    } 
 }
 
 void display_enter_test_mode(void)

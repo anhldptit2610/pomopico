@@ -23,4 +23,5 @@ target_link_libraries(pomopico
     hardware_gpio
     hardware_spi
     hardware_i2c
+    hardware_pwm
 )

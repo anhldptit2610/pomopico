@@ -21,8 +21,7 @@
 #define BUTTON_UP 15
 
 struct repeating_timer timer;
-volatile clk_t clock;
-volatile int shadowSec, shadowMin, shadowHour;
+clk_t clock;
 volatile bool upBtnPressed;
 
 clk_t *get_clock_inst(void)

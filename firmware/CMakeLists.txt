@@ -12,6 +12,7 @@ add_executable(pomopico
     pomopico.c
     display.c
     clock.c
+    sound.c
 )
 
 pico_enable_stdio_usb(pomopico 1)
@@ -24,4 +25,6 @@ target_link_libraries(pomopico
     hardware_spi
     hardware_i2c
     hardware_pwm
+    hardware_irq
+    m
 )

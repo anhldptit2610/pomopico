@@ -3,6 +3,7 @@
 #include "hardware/i2c.h"
 #include "display.h"
 #include "clock.h"
+#include "sound.h"
 
 #define I2C_BAUDRATE            100 * 1000
 #define DS1307_ADDR             0x68
@@ -112,8 +113,15 @@ void button_irq(uint gpio, uint32_t events)
 
 void clock_run(void)
 {
+    static bool playSound = false;
+
     switch (clock.oprMode) {
     case OPR_MODE_NORMAL:
+        if (clock.seconds == 0 && clock.minutes == 0 && !playSound) {
+            playSound = true;
+            sound_play_music();
+            playSound = false;
+        }
         break;
     case OPR_MODE_SET_SECONDS:
         if (upBtnPressed) {

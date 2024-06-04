@@ -2,6 +2,7 @@
     "cmake.sourceDirectory": "/home/anhld/Projects/pomopico/firmware",
     "files.associations": {
         "stdlib.h": "c",
-        "clock.h": "c"
+        "clock.h": "c",
+        "sound.h": "c"
     }
 }

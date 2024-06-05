@@ -266,7 +266,8 @@ void clock_run(void)
     case OPR_MODE_SET_SECONDS:
         if (clock.timeOrAlarm) {
             clock.alarm.seconds = (clock.setBtnPressed) ? (clock.alarm.seconds + 1) % 60 : clock.alarm.seconds;
-            clock.setBtnPressed = (clock.setBtnPressed) ? false : clock.setBtnPressed;
+            if (clock.setBtnPressed)
+                clock.setBtnPressed = false;
         } else if (clock.timeOrAlarm == false) {
             clock.time.seconds = (clock.upBtnPressed) ? (clock.time.seconds + 1) % 60 : clock.time.seconds;
             if (clock.upBtnPressed)
@@ -276,7 +277,8 @@ void clock_run(void)
     case OPR_MODE_SET_MINUTES:
         if (clock.timeOrAlarm) {
             clock.alarm.minutes = (clock.setBtnPressed) ? (clock.alarm.minutes + 1) % 60 : clock.alarm.minutes;
-            clock.setBtnPressed = (clock.setBtnPressed) ? false : clock.setBtnPressed;
+            if (clock.setBtnPressed)
+                clock.setBtnPressed = false;
         } else if (clock.timeOrAlarm == false) {
             clock.time.minutes = (clock.upBtnPressed) ? (clock.time.minutes + 1) % 60 : clock.time.minutes;
             if (clock.upBtnPressed)
@@ -286,7 +288,8 @@ void clock_run(void)
     case OPR_MODE_SET_HOURS:
         if (clock.timeOrAlarm) {
             clock.alarm.hours = (clock.setBtnPressed) ? (clock.alarm.hours + 1) % 24 : clock.alarm.hours;
-            clock.setBtnPressed = (clock.setBtnPressed) ? false : clock.setBtnPressed;
+            if (clock.setBtnPressed)
+                clock.setBtnPressed = false;
         } else if (clock.timeOrAlarm == false) {
             clock.time.hours = (clock.upBtnPressed) ? (clock.time.hours + 1) % 24 : clock.time.hours;
             if (clock.upBtnPressed)

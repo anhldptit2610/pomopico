@@ -15,6 +15,10 @@ typedef enum {
     OPR_MODE_SET_HOURS,
     OPR_MODE_ALARM_SET,
     OPR_MODE_ALARM_TRIGGER,
+    OPR_MODE_POMODORO_SETUP,
+    OPR_MODE_POMODORO_WORK,
+    OPR_MODE_POMODORO_QUIT,
+    OPR_MODE_POMODORO_REST,
 } clk_opr_mode_t;
 
 typedef struct alarm {
@@ -31,9 +35,13 @@ typedef struct clk_time {
 
 typedef struct clock {
     volatile bool timeOrAlarm;   // false = time, true = alarm
+    bool pomodoroEnable;
     bool upBtnPressed;
     bool setBtnPressed;
     bool alarmAck;
+    int pomodoroTimer;
+    bool pomodoroSwitchMode;
+    bool pomodoroSetup;
     clk_time_t time;
     alarm_t alarm;
     uint8_t control;

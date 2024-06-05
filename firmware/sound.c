@@ -106,7 +106,7 @@
 uint slice_num;
 uint chan;
 
-int melody[] = {
+int pacman[] = {
     // Pacman
     // Score available at https://musescore.com/user/85429/scores/107109
     NOTE_B4, 16, NOTE_B5, 16, NOTE_FS5, 16, NOTE_DS5, 16, //1
@@ -117,7 +117,7 @@ int melody[] = {
     NOTE_F5, 32,  NOTE_FS5, 32,  NOTE_G5, 32,  NOTE_G5, 32, NOTE_GS5, 32,  NOTE_A5, 16, NOTE_B5, 8
 };
 
-int notes = sizeof(melody) / sizeof(melody[0]) / 2;
+int notes = sizeof(pacman) / sizeof(pacman[0]) / 2;
 int wholeNote = (60000 * 4) / TEMPO;
 int divider = 0;
 int noteDuration = 0;
@@ -125,26 +125,48 @@ int noteDuration = 0;
 void sound_play_note(uint32_t note, int time)
 {
     sound_set_freq_duty(note, 50);
-    pwm_set_enabled(slice_num, true);
     sleep_ms(time * 0.9);
     sound_set_freq_duty(note, 0);
     sleep_ms(time * 0.1);
 }
 
-void sound_play_music(void)
+void disable_pwm(void)
 {
-    for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
-        // calculate the duration of each note
-        divider = melody[thisNote + 1];
-        if (divider > 0) {
-            // regular note, just proceed
-            noteDuration = (wholeNote) / divider;
-        } else if (divider < 0) {
-            // dotted notes are represented with negative durations!
-            noteDuration = (wholeNote) / abs(divider);
-            noteDuration *= 1.5;
+    pwm_set_enabled(slice_num, false);
+}
+
+void sound_play_music(sound_list_t sound, bool delay)
+{
+    pwm_set_enabled(slice_num, true);
+    switch (sound) {
+    case SOUND_PACMAN:
+        for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
+            // calculate the duration of each note
+            divider = pacman[thisNote + 1];
+            if (divider > 0) {
+                // regular note, just proceed
+                noteDuration = (wholeNote) / divider;
+            } else if (divider < 0) {
+                // dotted notes are represented with negative durations!
+                noteDuration = (wholeNote) / abs(divider);
+                noteDuration *= 1.5;
+            }
+            sound_play_note(pacman[thisNote], noteDuration);
         }
-        sound_play_note(melody[thisNote], noteDuration);
+        if (delay) {
+            sound_set_freq_duty(NOTE_A1, 0);
+            sleep_ms(1000);
+        }
+        pwm_set_enabled(slice_num, false);
+        break;
+    case SOUND_BEEP_TIME: 
+        sound_play_note(1000, 200);
+        break;
+    case SOUND_BEEP_ALARM: 
+        sound_play_note(NOTE_A6, 200);
+        break;
+    default:
+        break;
     }
     pwm_set_enabled(slice_num, false);
 }

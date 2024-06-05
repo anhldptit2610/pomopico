@@ -9,15 +9,38 @@ typedef enum {
 typedef enum {
     OPR_MODE_UPDATE,
     OPR_MODE_NORMAL,
+    OPR_MODE_PREPARE_TIME_SET,
     OPR_MODE_SET_SECONDS,
     OPR_MODE_SET_MINUTES,
     OPR_MODE_SET_HOURS,
+    OPR_MODE_ALARM_SET,
+    OPR_MODE_ALARM_TRIGGER,
 } clk_opr_mode_t;
 
-typedef struct clock {
+typedef struct alarm {
     uint8_t seconds;
     uint8_t minutes;
     uint8_t hours;
+} alarm_t;
+
+typedef struct clk_time {
+    uint8_t seconds;
+    uint8_t minutes;
+    uint8_t hours;
+} clk_time_t;
+
+typedef struct clock {
+    volatile bool timeOrAlarm;   // false = time, true = alarm
+    bool upBtnPressed;
+    bool setBtnPressed;
+    bool alarmAck;
+    clk_time_t time;
+    alarm_t alarm;
+    uint8_t control;
+    uint8_t status;
+    uint8_t agingOffset;
+    uint8_t tempMSB;
+    uint8_t tempLSB;
     time_format_t timeFormat;
     clk_opr_mode_t oprMode;
 } clk_t;

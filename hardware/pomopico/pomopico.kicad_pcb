@@ -7,6 +7,12 @@
 		(legacy_teardrops no)
 	)
 	(paper "A4")
+	(title_block
+		(title "pomopico")
+		(date "2024-06-12")
+		(rev "v0.1")
+		(company "author - alcato")
+	)
 	(layers
 		(0 "F.Cu" signal)
 		(31 "B.Cu" signal)
@@ -9695,7 +9701,7 @@
 		)
 		(fp_arc
 			(start 20.68 -1.32)
-			(mid 21.329538 -0.95046)
+			(mid 21.32952 -0.950442)
 			(end 21.59 -0.25)
 			(stroke
 				(width 0.05)

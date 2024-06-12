@@ -33,15 +33,22 @@ typedef struct clk_time {
     uint8_t hours;
 } clk_time_t;
 
+typedef struct pomodoro {
+    int counter;
+    int timer;
+    bool switchMode;
+    bool needSetup;
+} pomodoro_t;
+
 typedef struct clock {
     volatile bool timeOrAlarm;   // false = time, true = alarm
     bool pomodoroEnable;
     bool upBtnPressed;
     bool setBtnPressed;
     bool alarmAck;
-    int pomodoroTimer;
-    bool pomodoroSwitchMode;
-    bool pomodoroSetup;
+    // int pomodoroTimer;
+    // bool pomodoroSwitchMode;
+    // bool pomodoroSetup;
     clk_time_t time;
     alarm_t alarm;
     uint8_t control;

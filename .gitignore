@@ -1,2 +1,8 @@
 /firmware/build
 /build
+/hardware/pomopico/pomopico-backups
+/hardware/pomopico/fp*
+/hardware/pomopico/sym-lib-table
+/hardware/pomopico/*.kicad_prl
+/hardware/pomopico/pdfs/
+/hardware/pomopico/*.gbrjob

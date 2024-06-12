@@ -35,6 +35,8 @@
 
 struct repeating_timer RTClock, RTPomodoro;
 clk_t clock;
+pomodoro_t pomodoro;
+
 
 clk_t *get_clock_inst(void)
 {
@@ -109,12 +111,12 @@ void ds3231_read_raw(struct clock *clock)
 
 bool pomodoro_callback(struct repeating_timer *t)
 {
-    struct clock *clock = (struct clock *)t->user_data;
+    // struct clock *clock = (struct clock *)t->user_data;
+    pomodoro_t *pomodoro = (pomodoro_t *)t->user_data;
 
-    printf("pomodoro callback! pomodoro: %d\n", clock->pomodoroTimer);
-    if (clock->pomodoroTimer > 0)
-        clock->pomodoroTimer--;
-    display_show_time(0, clock->pomodoroTimer, 0);
+    if (pomodoro->timer > 0)
+        pomodoro->timer--;
+    display_show_time(0, pomodoro->timer, 0);
     return true;
 }
 
@@ -199,50 +201,15 @@ void gpio_irq(uint gpio, uint32_t events)
         clock.oprMode = OPR_MODE_ALARM_TRIGGER;
         break;
     case POMODORO_BTN:
-        if (!clock.pomodoroSetup) {
-            clock.pomodoroSetup = true;
+        if (!pomodoro.needSetup) {
+            pomodoro.needSetup = true;
             clock.oprMode = OPR_MODE_POMODORO_SETUP;
-        } else if (!clock.pomodoroTimer && !clock.pomodoroSwitchMode)
-            clock.pomodoroSwitchMode = true;
+        } else if (!pomodoro.timer && !pomodoro.switchMode)
+            pomodoro.switchMode = true;
         break;
     default:
         break;
     }
-    // if (gpio == BUTTON_SET) {
-    //     clock.setBtnPressed = true;
-    //     if (clock.oprMode == OPR_MODE_NORMAL)
-    //         add_alarm_in_ms(3000, btn_set_callback, (void *)&clock, false);
-    //     else if ((clock.oprMode == OPR_MODE_SET_SECONDS) && (clock.timeOrAlarm == false))
-    //         clock.oprMode = OPR_MODE_SET_MINUTES;
-    //     else if ((clock.oprMode == OPR_MODE_SET_MINUTES) && (clock.timeOrAlarm == false))
-    //         clock.oprMode = OPR_MODE_SET_HOURS;
-    //     else if ((clock.oprMode == OPR_MODE_SET_HOURS) && (clock.timeOrAlarm == false))
-    //         clock.oprMode = OPR_MODE_UPDATE;
-    //     else if (clock.oprMode == OPR_MODE_ALARM_TRIGGER) {
-    //         clock.alarmAck = true;
-    //         disable_pwm();
-    //     } else if (clock.oprMode == OPR_MODE_POMODORO_WORK || clock.oprMode == OPR_MODE_POMODORO_REST) {
-    //         clock.oprMode = OPR_MODE_POMODORO_QUIT;
-    //     }
-    // } else if (gpio == BUTTON_UP) {
-    //     clock.upBtnPressed = true;
-    //     if (clock.oprMode == OPR_MODE_NORMAL) {
-    //         add_alarm_in_ms(3000, btn_up_callback, (void *)&clock, false);
-    //     } else if ((clock.oprMode == OPR_MODE_SET_SECONDS) && clock.timeOrAlarm) {
-    //         clock.oprMode = OPR_MODE_SET_MINUTES;
-    //     } else if ((clock.oprMode == OPR_MODE_SET_MINUTES) && clock.timeOrAlarm) {
-    //         clock.oprMode = OPR_MODE_SET_HOURS;
-    //     } else if ((clock.oprMode == OPR_MODE_SET_HOURS) && clock.timeOrAlarm) {
-    //         clock.oprMode = OPR_MODE_UPDATE;
-    //     }
-    // } else if (gpio == ALARM_PIN) {
-    //     clock.oprMode = OPR_MODE_ALARM_TRIGGER;
-    // } else if (gpio == POMODORO_BTN) {
-    //     if (clock.oprMode != OPR_MODE_POMODORO_WORK)
-    //         clock.oprMode = OPR_MODE_POMODORO_SETUP;
-    //     else if (!clock.pomodoroTimer && !clock.pomodoroSwitchMode)
-    //         clock.pomodoroSwitchMode = true;
-    // }
 }
 
 void clock_run(void)
@@ -325,41 +292,42 @@ void clock_run(void)
         break;
     case OPR_MODE_POMODORO_SETUP:
         clock.oprMode = OPR_MODE_POMODORO_WORK;
-        clock.pomodoroTimer = 25;
-        display_show_time(0, clock.pomodoroTimer, 0);
+        pomodoro.timer = 25;
+        display_show_time(0, pomodoro.timer, 0);
         sound_play_music(SOUND_BEEP_ALARM, false);
-        add_repeating_timer_ms(POMODORO_TIMER_MS, pomodoro_callback, (void *)&clock, &RTPomodoro);
+        add_repeating_timer_ms(POMODORO_TIMER_MS, pomodoro_callback, (void *)&pomodoro, &RTPomodoro);
         break;
     case OPR_MODE_POMODORO_WORK:
-        if (!clock.pomodoroTimer && !pomodoroNoti) {
+        if (!pomodoro.timer && !pomodoroNoti) {
             pomodoroNoti = true;
             sound_play_music(SOUND_PACMAN, false);
             cancel_repeating_timer(&RTPomodoro);
         }
-        if (clock.pomodoroSwitchMode) {
-            clock.pomodoroSwitchMode = false;
+        if (pomodoro.switchMode) {
+            pomodoro.switchMode = false;
             pomodoroNoti = false;
-            clock.pomodoroTimer = 5;
+            pomodoro.timer = (pomodoro.counter == 3) ? 15 : 5;
+            pomodoro.counter = (pomodoro.counter == 3) ? 0 : pomodoro.counter + 1;
             clock.oprMode = OPR_MODE_POMODORO_REST;
             sound_play_music(SOUND_BEEP_ALARM, false);
-            display_show_time(0, clock.pomodoroTimer, 0);
-            add_repeating_timer_ms(POMODORO_TIMER_MS, pomodoro_callback, (void *)&clock, &RTPomodoro);
+            display_show_time(0, pomodoro.timer, 0);
+            add_repeating_timer_ms(POMODORO_TIMER_MS, pomodoro_callback, (void *)&pomodoro, &RTPomodoro);
         }
         break;
     case OPR_MODE_POMODORO_REST:
-        if (!clock.pomodoroTimer && !pomodoroNoti) {
+        if (!pomodoro.timer && !pomodoroNoti) {
             pomodoroNoti = true;
             sound_play_music(SOUND_PACMAN, false);
             cancel_repeating_timer(&RTPomodoro);
         }
-        if (clock.pomodoroSwitchMode) {
-            clock.pomodoroSwitchMode = false;
+        if (pomodoro.switchMode) {
+            pomodoro.switchMode = false;
             pomodoroNoti = false;
-            clock.pomodoroTimer = 25;
+            pomodoro.timer = 25;
             clock.oprMode = OPR_MODE_POMODORO_WORK;
-            display_show_time(0, clock.pomodoroTimer, 0);
+            display_show_time(0, pomodoro.timer, 0);
             sound_play_music(SOUND_BEEP_ALARM, false);
-            add_repeating_timer_ms(POMODORO_TIMER_MS, pomodoro_callback, (void *)&clock, &RTPomodoro);
+            add_repeating_timer_ms(POMODORO_TIMER_MS, pomodoro_callback, (void *)&pomodoro, &RTPomodoro);
         }
         break;
     case OPR_MODE_POMODORO_QUIT:
@@ -390,9 +358,9 @@ void clock_init(void)
     clock.upBtnPressed = false;
     clock.timeOrAlarm = false;
     clock.alarmAck = false;
-    clock.pomodoroEnable = false;
-    clock.pomodoroSwitchMode = false;
-    clock.pomodoroSetup = false;
+    pomodoro.switchMode = false;
+    pomodoro.needSetup = false;
+    pomodoro.counter = 0;
 
     ds3231_read_raw(&clock);
 
